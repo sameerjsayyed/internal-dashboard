@@ -1,0 +1,6 @@
+# Python
+__pycache__/
+*.pyc
+.env
+upload_history.db
+uploads/

@@ -1,0 +1,44 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav [mode]="isDesktop ? 'over' : 'side'" [opened]="isDesktop || sidenavOpened" class="app-sidenav">
+    <div class="sidenav-header">
+      <button mat-icon-button (click)="toggleSidenav()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span class="title">Menu</span>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item routerLink="/upload" routerLinkActive="active-link">
+        <mat-icon>upload_file</mat-icon>
+        <span>Time Dashboard</span>
+      </a>
+
+      <a mat-list-item routerLink="/history" routerLinkActive="active-link">
+        <mat-icon>history</mat-icon>
+        <span>Past Reports</span>
+      </a>
+
+      <a mat-list-item routerLink="/rph-maintenance" routerLinkActive="active-link">
+        <mat-icon>edit</mat-icon>
+        <span>RPH Maintenance</span>
+      </a>
+
+      <a mat-list-item routerLink="/revenue-report" routerLinkActive="active-link">
+        <mat-icon>bar_chart</mat-icon>
+        <span>Revenue Report</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="topbar">
+      <button mat-icon-button (click)="toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      Time Booking Dashboard
+    </mat-toolbar>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

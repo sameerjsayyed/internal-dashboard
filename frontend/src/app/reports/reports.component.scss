@@ -1,0 +1,50 @@
+.report-tabs {
+  margin: 2rem auto;
+  padding: 1rem;
+  max-width: 98%;
+}
+
+.download-btns {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+
+  button {
+    text-transform: none;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.report-panel {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+
+  ::ng-deep .mat-tab-group {
+    max-width: 100%;
+  }
+
+  ::ng-deep .mat-tab-body {
+    overflow-x: auto;
+    padding: 0 !important;
+  }
+}
+// Tab styling
+::ng-deep .mat-tab-label {
+  color: #000;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  text-transform: none;
+}
+
+::ng-deep .mat-tab-label-active {
+  color: #fd5108;
+  border-bottom: 2px solid #fd5108;
+}

@@ -1,0 +1,91 @@
+<mat-card class="rph-panel mat-elevation-z2">
+  <mat-card-title>💰 RPH Maintenance</mat-card-title>
+
+  <!-- Download Template Above Upload -->
+  <div class="header-actions">
+    <button mat-stroked-button color="primary" (click)="downloadTemplate()">
+      <mat-icon>download</mat-icon> Download Template
+    </button>
+  </div>
+
+  <!-- Upload Dropzone -->
+  <div class="dropzone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+    [class.hovered]="dragOver">
+    <p>
+      📥 Drag & drop Excel file here or
+      <span class="browse" (click)="fileInput?.click()">browse</span>
+    </p>
+    <input #fileInput type="file" hidden (change)="handleFileUpload($event)" accept=".xls,.xlsx" />
+  </div>
+
+  <!-- Top Right Actions -->
+  <div class="table-actions">
+    <button mat-stroked-button color="primary" (click)="saveAll()">
+      <mat-icon>save</mat-icon> Save All
+    </button>
+
+    <button mat-stroked-button (click)="downloadExcel()">
+      <mat-icon>download</mat-icon> Download Excel
+    </button>
+  </div>
+
+  <!-- RPH Table -->
+  <table mat-table [dataSource]="rows.controls" class="modern-table mat-elevation-z1" *ngIf="rows.length">
+    <!-- Contract Code -->
+    <ng-container matColumnDef="contract_code">
+      <th mat-header-cell *matHeaderCellDef>Contract Code</th>
+      <td mat-cell *matCellDef="let row">
+        <input matInput [formControl]="row.get('contract_code')" />
+        <mat-icon *ngIf="highlightMap.get(row)" class="edited-icon">edit</mat-icon>
+      </td>
+    </ng-container>
+
+    <!-- Contract Name -->
+    <ng-container matColumnDef="contract_name">
+      <th mat-header-cell *matHeaderCellDef>Contract Name</th>
+      <td mat-cell *matCellDef="let row">
+        <input matInput [formControl]="row.get('contract_name')" />
+        <mat-icon *ngIf="highlightMap.get(row)" class="edited-icon">edit</mat-icon>
+      </td>
+    </ng-container>
+
+    <!-- Task Code -->
+    <ng-container matColumnDef="task_code">
+      <th mat-header-cell *matHeaderCellDef>Task Code</th>
+      <td mat-cell *matCellDef="let row">
+        <input matInput [formControl]="row.get('task_code')" />
+        <mat-icon *ngIf="highlightMap.get(row)" class="edited-icon">edit</mat-icon>
+      </td>
+    </ng-container>
+
+    <!-- RPH -->
+    <ng-container matColumnDef="rph">
+      <th mat-header-cell *matHeaderCellDef>RPH</th>
+      <td mat-cell *matCellDef="let row">
+        <input matInput type="number" [formControl]="row.get('rph')" />
+        <mat-icon *ngIf="highlightMap.get(row)" class="edited-icon">edit</mat-icon>
+      </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row; let i = index">
+        <button mat-icon-button color="warn" (click)="removeRow(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Table Rows -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.highlighted]="highlightMap.get(row)"></tr>
+  </table>
+
+  <!-- Add Row Below Table -->
+  <div class="footer-add-row">
+    <button mat-stroked-button color="accent" (click)="addRow()">
+      <mat-icon>add</mat-icon> Add Row
+    </button>
+  </div>
+</mat-card>

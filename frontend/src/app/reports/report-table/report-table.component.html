@@ -1,0 +1,71 @@
+<div class="toolbar-row">
+  <mat-form-field appearance="outline" class="search-bar">
+    <mat-label>Search</mat-label>
+    <input matInput placeholder="Filter rows..." [(ngModel)]="filterText" (input)="applyFilter()" />
+    <button mat-icon-button matSuffix *ngIf="filterText" (click)="filterText = ''; applyFilter()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <button mat-stroked-button color="primary" (click)="download()">
+    <mat-icon>download</mat-icon>
+    Download Excel
+  </button>
+</div>
+
+<div class="filter-controls">
+  <mat-form-field appearance="outline">
+    <mat-label>Contract Code</mat-label>
+    <mat-select multiple [(value)]="selectedContractCodes" (selectionChange)="applyFilter()">
+      <mat-option *ngFor="let code of allContractCodes" [value]="code">
+        {{ code }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Task Code</mat-label>
+    <mat-select multiple [(value)]="selectedTaskCodes" (selectionChange)="applyFilter()">
+      <mat-option *ngFor="let task of allTaskCodes" [value]="task">
+        {{ task }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+
+
+<div class="table-scroll-wrapper">
+  <!-- Actual Angular Material Table -->
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z1">
+    <!-- Columns -->
+    <ng-container *ngFor="let col of finalDisplayedColumns" [matColumnDef]="col">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ col === "__rowTotal" ? "Total" : col }}
+      </th>
+      <td mat-cell *matCellDef="let row" [class.right-align]="isSummableColumn(col)"
+        [class.total-column]="col === '__rowTotal'">
+        <ng-container *ngIf="isNumeric(row[col]) && isSummableColumn(col); else raw">
+          {{ row[col] | number : "1.0-2" }}
+        </ng-container>
+        <ng-template #raw>{{ row[col] }}</ng-template>
+      </td>
+
+      <td mat-footer-cell *matFooterCellDef class="total-cell" [class.right-align]="isSummableColumn(col)"
+        [class.total-column]="col === '__rowTotal'">
+        <ng-container *ngIf="isNumeric(columnTotals[col]) && isSummableColumn(col)">
+          <strong>{{ columnTotals[col] | number : "1.0-2" }}</strong>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <!-- Header Row -->
+    <tr mat-header-row *matHeaderRowDef="finalDisplayedColumns" sticky></tr>
+
+    <!-- Data Rows -->
+    <tr mat-row *matRowDef="let row; columns: finalDisplayedColumns"></tr>
+
+    <!-- Totals Row -->
+    <tr mat-footer-row *matFooterRowDef="finalDisplayedColumns" sticky></tr>
+  </table>
+</div>

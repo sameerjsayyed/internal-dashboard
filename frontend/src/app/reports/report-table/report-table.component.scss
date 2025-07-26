@@ -1,0 +1,124 @@
+.table-scroll-wrapper {
+  background: #ffffff;
+  max-height: 500px;
+  overflow: auto;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  background: #ffffff;
+
+  th, td {
+    color: #000;
+    border: 1px solid #eee;
+    white-space: nowrap;
+    padding: 5px 5px;
+    font-size: 12px;
+    max-width: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: clip;
+  }
+
+  tr.mat-mdc-row {
+    height: 40px;
+  }
+
+
+  td.total-column, th.total-column {
+    background: #fffbe6;
+    font-weight: bold;
+    color: #3e3e00;
+    text-align: right;
+  }
+
+  td.mat-cell {
+    background-color: #fff;
+    color: #000;
+  }
+
+}
+
+.toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+
+  .search-bar {
+    width: 300px;
+
+    ::ng-deep .mat-mdc-form-field-infix {
+      color: #000; // input text
+      .mat-mdc-input-element {
+        color: #000 !important; // ensures entered text is black
+        font-weight: 500;
+      }
+    }
+
+    ::ng-deep .mat-mdc-form-field-input::placeholder {
+      color: #888 !important; // placeholder inside input
+      opacity: 1 !important;
+    }
+  }
+
+}
+.right-align {
+  text-align: right;
+}
+::ng-deep th.mat-mdc-header-cell {
+  position: sticky;
+  top: 0;
+  background: #f4f4f4;
+  z-index: 10;
+  font-weight: 600;
+}
+::ng-deep th.mat-mdc-header-cell.total-column {
+  background: #fffbe6;
+  font-weight: bold;
+  color: #3e3e00;
+}
+::ng-deep td.mat-mdc-footer-cell {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: #e8f5e9;
+  font-weight: bold;
+  border-top: 2px solid #4caf50;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  color: #2e7d32;
+  text-align: right;
+}
+::ng-deep td.mat-mdc-cell.total-column,
+::ng-deep td.mat-mdc-footer-cell.total-column,
+::ng-deep th.mat-mdc-header-cell.total-column {
+  background: #fffbe6;
+  font-weight: bold;
+  color: #3e3e00;
+  text-align: right;
+}
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  mat-form-field {
+    min-width: 200px;
+  }
+}
+
+::ng-deep .mat-mdc-select,
+::ng-deep .mat-mdc-form-field-input {
+  color: #000 !important; // ensures entered text is black
+  font-weight: 500;
+}
+::ng-deep .mat-mdc-floating-label,
+::ng-deep .mat-mdc-form-field-label {
+  color: #888 !important; // placeholder label
+  opacity: 1 !important;  // make it solid, not faded
+}
