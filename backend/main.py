@@ -109,7 +109,7 @@ def generate_revenue_response(df: pd.DataFrame) -> dict:
             "taskWiseRevenue": to_report(task_revenue),
             "contractWiseRevenue": to_report(contract_revenue),
             "monthlyRevenue": to_report(month_revenue),
-            "quarterlyRevenue": to_report(quarterly_revenue)
+            "quarterlyRevenue": to_report(quarter_revenue)
         }
     except Exception as e:
         print(f"Error in generate_revenue_response: {str(e)}")
