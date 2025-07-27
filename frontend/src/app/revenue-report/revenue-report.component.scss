@@ -1,7 +1,7 @@
 .revenue-panel {
-  margin: 2rem auto;
+  margin: 0.5rem auto;
   max-width: 1400px;
-  padding: 2rem;
+  padding: 0.5rem;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -18,7 +18,7 @@
     font-size: 1.75rem;
     font-weight: 700;
     color: #fd5108;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -33,7 +33,7 @@
 
 // Modern tab styling for revenue report
 .revenue-tabs {
-  margin: 2rem 0;
+  margin: 1rem 0;
   
   ::ng-deep .mat-tab-group {
     .mat-tab-header {

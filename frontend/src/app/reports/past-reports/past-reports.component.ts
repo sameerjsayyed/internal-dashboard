@@ -8,7 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from '../../services/api.service';
 import { MatSortModule } from '@angular/material/sort';
 
 @Component({
@@ -42,11 +42,11 @@ export class PastReportsComponent implements OnInit {
   currentSortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:8000/history').subscribe({
-      next: (data) => {
+    this.apiService.getUploadHistory().subscribe({
+      next: (data: any[]) => {
         this.dataSource = data;
         this.filteredDataSource = [...data];
       },
@@ -123,7 +123,7 @@ export class PastReportsComponent implements OnInit {
 
   deleteOne(id: number) {
     if (!confirm('Delete this record?')) return;
-    this.http.delete(`http://localhost:8000/history/${id}`).subscribe(() => {
+    this.apiService.deleteUploadHistory(id).subscribe(() => {
       this.dataSource = this.dataSource.filter((row) => row.id !== id);
       this.applySearch();
     });
@@ -131,7 +131,7 @@ export class PastReportsComponent implements OnInit {
 
   clearAll() {
     if (!confirm('Clear all upload history?')) return;
-    this.http.delete('http://localhost:8000/history').subscribe(() => {
+    this.apiService.clearAllUploadHistory().subscribe(() => {
       this.dataSource = [];
       this.filteredDataSource = [];
     });

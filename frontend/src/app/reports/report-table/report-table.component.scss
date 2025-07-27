@@ -5,7 +5,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
-  margin-top: 1rem;
+  margin-top: 0;
   max-width: 100%;
 }
 
@@ -45,6 +45,9 @@
       padding: 0.6rem 0.8rem;
       min-height: auto;
     }
+    .mat-mdc-form-field-icon-suffix .mat-icon{
+      color: #fd5108;
+    }
     
     .mat-mdc-input-element {
       background: transparent;
@@ -76,6 +79,9 @@
     .mat-mdc-select-value {
       color: #1a1a1a;
       font-size: 0.8rem;
+    }
+    .mat-mdc-select-arrow {
+      color: #fd5108;
     }
     
     .mat-mdc-select-placeholder {

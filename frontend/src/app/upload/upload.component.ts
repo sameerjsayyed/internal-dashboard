@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from '../services/api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,7 +31,7 @@ export class UploadComponent implements OnInit {
   reports: any = null;
 
   constructor(
-    private http: HttpClient,
+    private apiService: ApiService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -82,7 +82,7 @@ export class UploadComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    this.http.post('http://localhost:8000/upload', formData).subscribe({
+    this.apiService.uploadFile(formData).subscribe({
       next: (response: any) => {
         this.uploading = false;
         this.uploadedFile = {
@@ -94,7 +94,7 @@ export class UploadComponent implements OnInit {
         // Set reports data from upload response
         this.reports = response;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.uploading = false;
         this.snackBar.open('Upload failed. Please try again.', 'Close', { duration: 3000 });
         console.error('Upload error:', error);
@@ -104,7 +104,7 @@ export class UploadComponent implements OnInit {
 
   private loadLastUploadedFile(): void {
     // Load last uploaded file info from API
-    this.http.get('http://localhost:8000/history/latest').subscribe({
+    this.apiService.getLatestUpload().subscribe({
       next: (response: any) => {
         if (response && response.file_name) {
           this.uploadedFile = {
@@ -113,7 +113,7 @@ export class UploadComponent implements OnInit {
           };
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading last uploaded file:', error);
       }
     });
@@ -121,21 +121,21 @@ export class UploadComponent implements OnInit {
 
   private loadReports(): void {
     // Load reports data from latest upload
-    this.http.get('http://localhost:8000/history/latest').subscribe({
+    this.apiService.getLatestUpload().subscribe({
       next: (response: any) => {
         if (response && response.id) {
           // Get the report data for the latest upload
-          this.http.get(`http://localhost:8000/history/${response.id}`).subscribe({
+          this.apiService.getUploadById(response.id).subscribe({
             next: (reportData: any) => {
               this.reports = reportData;
             },
-            error: (error) => {
+            error: (error: any) => {
               console.error('Error loading report data:', error);
             }
           });
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading latest upload:', error);
       }
     });
