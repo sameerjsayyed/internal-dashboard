@@ -61,14 +61,14 @@ def parse_raw_excel(file_buffer, filename: str) -> pd.DataFrame:
     df[CONTRACT_NUMBER_COL] = df[CONTRACT_NUMBER_COL].astype(str)
     df[TASK_NUMBER_COL] = df[TASK_NUMBER_COL].astype(str)
     
-    print(f"Contract Number column type: {df[CONTRACT_NUMBER_COL].dtype}")
-    print(f"Task Number column type: {df[TASK_NUMBER_COL].dtype}")
-    print(f"Sample Contract Numbers: {df[CONTRACT_NUMBER_COL].head().tolist()}")
-    print(f"Sample Task Numbers: {df[TASK_NUMBER_COL].head().tolist()}")
+    # print(f"Contract Number column type: {df[CONTRACT_NUMBER_COL].dtype}")
+    # print(f"Task Number column type: {df[TASK_NUMBER_COL].dtype}")
+    # print(f"Sample Contract Numbers: {df[CONTRACT_NUMBER_COL].head().tolist()}")
+    # print(f"Sample Task Numbers: {df[TASK_NUMBER_COL].head().tolist()}")
     
     # Handle multiple date formats
-    print(f"Original date column type: {df[TIME_BOOKING_DATE_COL].dtype}")
-    print(f"Sample date values: {df[TIME_BOOKING_DATE_COL].head().tolist()}")
+    # print(f"Original date column type: {df[TIME_BOOKING_DATE_COL].dtype}")
+    # print(f"Sample date values: {df[TIME_BOOKING_DATE_COL].head().tolist()}")
     
     # If the column is already datetime (Excel auto-converted), use it directly
     if pd.api.types.is_datetime64_any_dtype(df[TIME_BOOKING_DATE_COL]):
@@ -105,7 +105,7 @@ def parse_raw_excel(file_buffer, filename: str) -> pd.DataFrame:
     df[TIME_BOOKING_DATE_COL] = pd.to_datetime(df[TIME_BOOKING_DATE_COL], errors="coerce")
 
     df["Month"] = df[TIME_BOOKING_DATE_COL].dt.strftime(MONTH_FMT)
-    print(f"df: {df}")
+    # print(f"df: {df}")
     return df
 
 def build_reports(df: pd.DataFrame):

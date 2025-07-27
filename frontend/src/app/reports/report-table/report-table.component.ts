@@ -45,14 +45,15 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
   @Input() columns: string[] = [];
   @Input() rows: any[] = [];
   @Input() data: any = null;
-  
+  isRevenueReport: boolean = false;
+
   @ViewChild(MatSort) sort!: MatSort;
   dataSource = new MatTableDataSource<any>([]);
   filterText = '';
   searchTerm = '';
   selectedContract = '';
   selectedTask = '';
-  
+
   // For modern template
   filteredData: any[] = [];
   currentSortColumn = '';
@@ -80,7 +81,14 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
         this.columns = Object.keys(this.rows[0] || {});
       }
     }
-    
+
+    // Detect if this is a revenue report (has any columns ending with Revenue and Booked Hours)
+    const hasBookedHours = this.columns.some((col) =>
+      col.endsWith('Booked Hours')
+    );
+    const hasRevenue = this.columns.some((col) => col.endsWith('Revenue'));
+    this.isRevenueReport = hasBookedHours && hasRevenue;
+
     if (this.rows && this.columns) {
       this.addRowTotals();
       this.dataSource = new MatTableDataSource(this.rows);
@@ -105,7 +113,7 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
       this.searchTerm = '';
       this.selectedContract = '';
       this.selectedTask = '';
-      
+
       // Apply initial filters to add totals row
       this.applyFilters();
     }
@@ -125,22 +133,22 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
       this.currentSortColumn = columnKey;
       this.sortDirection = 'asc';
     }
-    
+
     // Remove totals row before sorting
-    const totalsRow = this.filteredData.find(row => row.isSummary);
-    const dataRows = this.filteredData.filter(row => !row.isSummary);
-    
+    const totalsRow = this.filteredData.find((row) => row.isSummary);
+    const dataRows = this.filteredData.filter((row) => !row.isSummary);
+
     dataRows.sort((a, b) => {
       const aVal = a[columnKey] || 0;
       const bVal = b[columnKey] || 0;
-      
+
       if (this.sortDirection === 'asc') {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
       }
     });
-    
+
     // Add totals row back at the end
     this.filteredData = [...dataRows];
     if (totalsRow) {
@@ -150,7 +158,9 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
 
   getSortIcon(columnKey: string): string {
     if (this.currentSortColumn !== columnKey) return 'unfold_more';
-    return this.sortDirection === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
+    return this.sortDirection === 'asc'
+      ? 'keyboard_arrow_up'
+      : 'keyboard_arrow_down';
   }
 
   formatValue(value: any, type: string): string {
@@ -165,35 +175,87 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
   }
 
   applyFilters() {
-    this.filteredData = this.rows.filter(row => {
+    this.filteredData = this.rows.filter((row) => {
       // Search filter
-      const searchMatch = !this.searchTerm || 
-        Object.values(row).some(val => 
-          val && val.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
+      const searchMatch =
+        !this.searchTerm ||
+        Object.values(row).some(
+          (val) =>
+            val &&
+            val.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
         );
-      
+
       // Contract filter
-      const contractMatch = !this.selectedContract || 
+      const contractMatch =
+        !this.selectedContract ||
         row['Contract Number'] === this.selectedContract;
-      
+
       // Task filter
-      const taskMatch = !this.selectedTask || 
-        row['Task Number'] === this.selectedTask;
-      
+      const taskMatch =
+        !this.selectedTask || row['Task Number'] === this.selectedTask;
+
       return searchMatch && contractMatch && taskMatch;
     });
-    
-    // Add totals row
+
+    // Add totals row(s)
     if (this.filteredData.length > 0) {
-      const totalsRow: any = { isSummary: true };
-      this.displayedColumns.forEach(col => {
-        if (this.isSummableColumn(col)) {
-          totalsRow[col] = this.filteredData.reduce((sum, row) => sum + (row[col] || 0), 0);
-        } else {
-          totalsRow[col] = '';
-        }
-      });
-      this.filteredData.push(totalsRow);
+      if (this.isRevenueReport) {
+        // Two totals rows: Booked Hours and Revenue
+        const bookedHoursRow: any = {
+          isSummary: true,
+          summaryType: 'Booked Hours',
+        };
+        const revenueRow: any = { isSummary: true, summaryType: 'Revenue' };
+        this.displayedColumns.forEach((col) => {
+          if (col.endsWith('Booked Hours')) {
+            bookedHoursRow[col] = this.filteredData.reduce(
+              (sum, row) => sum + (row[col] || 0),
+              0
+            );
+            revenueRow[col] = '';
+          } else if (col.endsWith('Revenue')) {
+            revenueRow[col] = this.filteredData.reduce(
+              (sum, row) => sum + (row[col] || 0),
+              0
+            );
+            bookedHoursRow[col] = '';
+          } else if (col === 'Booked Hours Total') {
+            bookedHoursRow[col] = this.filteredData.reduce(
+              (sum, row) => sum + (row['Booked Hours Total'] || 0),
+              0
+            );
+            revenueRow[col] = '';
+          } else if (col === 'Revenue Total') {
+            revenueRow[col] = this.filteredData.reduce(
+              (sum, row) => sum + (row['Revenue Total'] || 0),
+              0
+            );
+            bookedHoursRow[col] = '';
+          } else if (this.isSummableColumn(col)) {
+            bookedHoursRow[col] = '';
+            revenueRow[col] = '';
+          } else {
+            bookedHoursRow[col] = '';
+            revenueRow[col] = '';
+          }
+        });
+        this.filteredData.push(bookedHoursRow);
+        this.filteredData.push(revenueRow);
+      } else {
+        // Default: single totals row
+        const totalsRow: any = { isSummary: true };
+        this.displayedColumns.forEach((col) => {
+          if (this.isSummableColumn(col)) {
+            totalsRow[col] = this.filteredData.reduce(
+              (sum, row) => sum + (row[col] || 0),
+              0
+            );
+          } else {
+            totalsRow[col] = '';
+          }
+        });
+        this.filteredData.push(totalsRow);
+      }
     }
   }
 
@@ -251,14 +313,34 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
     return this.columnTotals['__rowTotal'] || 0;
   }
 
+  get displayedColumns(): string[] {
+    // Add Booked Hours Total and Revenue Total columns if isRevenueReport
+    if (this.isRevenueReport) {
+      return [...this.columns, 'Booked Hours Total', 'Revenue Total'];
+    }
+    return [...this.columns, '__rowTotal'];
+  }
+
   addRowTotals(): void {
     const summableCols = this.columns.filter(this.isSummableColumn);
     this.rows = this.rows.map((row) => {
+      // Booked Hours and Revenue totals for each row
+      const bookedHoursTotal = this.columns
+        .filter((col) => col.endsWith('Booked Hours'))
+        .reduce((sum, col) => sum + (+row[col] || 0), 0);
+      const revenueTotal = this.columns
+        .filter((col) => col.endsWith('Revenue'))
+        .reduce((sum, col) => sum + (+row[col] || 0), 0);
       const total = summableCols.reduce(
         (sum, col) => sum + (+row[col] || 0),
         0
       );
-      return { ...row, __rowTotal: total };
+      return {
+        ...row,
+        __rowTotal: total,
+        'Booked Hours Total': bookedHoursTotal,
+        'Revenue Total': revenueTotal,
+      };
     });
   }
 
@@ -272,34 +354,28 @@ export class ReportTableComponent implements OnChanges, AfterViewInit {
     );
   }
 
-  get displayedColumns(): string[] {
-    return [...this.columns, '__rowTotal'];
-  }
-
-  get finalDisplayedColumns(): string[] {
-    return [...this.columns, '__rowTotal'];
-  }
-
   download() {
-    const filteredRows = this.dataSource.filteredData;
-
-    const rowsWithTotal = filteredRows.map((row) => {
-      const total = this.displayedColumns
-        .filter(this.isSummableColumn)
-        .reduce((sum, c) => sum + (+row[c] || 0), 0);
-      return { ...row, Total: total };
-    });
-
-    const columnTotals: any = {};
-    this.displayedColumns.forEach((c) => {
-      if (c.includes('|') || c === '__rowTotal') {
-        columnTotals[c] = this.columnTotals[c] || 0;
+    // Use filteredData, which includes summary rows and new total columns
+    const exportRows = this.filteredData.map((row) => {
+      // For summary rows, keep as is; for normal rows, add Total columns if needed
+      if (row.isSummary) {
+        return row;
       } else {
-        columnTotals[c] = '';
+        // Add row total columns for Revenue reports
+        if (this.isRevenueReport) {
+          return {
+            ...row,
+            'Booked Hours Total': row['Booked Hours Total'],
+            'Revenue Total': row['Revenue Total'],
+          };
+        } else {
+          return {
+            ...row,
+            __rowTotal: row['__rowTotal'],
+          };
+        }
       }
     });
-
-    const exportRows = [...rowsWithTotal, columnTotals];
 
     const worksheet = XLSX.utils.json_to_sheet(exportRows, {
       header: this.displayedColumns,

@@ -7,7 +7,7 @@
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
-    
+
     <div class="filter-field">
       <mat-form-field appearance="outline">
         <mat-label>Contract Code</mat-label>
@@ -19,7 +19,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    
+
     <div class="filter-field">
       <mat-form-field appearance="outline">
         <mat-label>Task Code</mat-label>
@@ -31,13 +31,13 @@
         </mat-select>
       </mat-form-field>
     </div>
-    
-            <div class="download-btn">
-          <button mat-raised-button (click)="downloadExcel()">
-            <mat-icon>table_chart</mat-icon>
-            Export
-          </button>
-        </div>
+
+    <div class="download-btn">
+      <button mat-raised-button (click)="downloadExcel()">
+        <mat-icon>table_chart</mat-icon>
+        Export
+      </button>
+    </div>
   </div>
 
   <div class="table-wrapper">
@@ -55,11 +55,30 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of filteredData" [class.summary-row]="row.isSummary">
-          <td *ngFor="let column of displayedColumns" 
-              [class.highlight]="column === '__rowTotal' && row[column] > 0"
-              [class.total-row]="row.isSummary">
-            {{formatValue(row[column], 'number')}}
+        <tr *ngFor="let row of filteredData" [class.summary-row]="row.isSummary"
+          [class.booked-hours-total]="row.summaryType === 'Booked Hours'"
+          [class.revenue-total]="row.summaryType === 'Revenue'">
+          <td *ngFor="let column of displayedColumns" [class.highlight]="column === '__rowTotal' && row[column] > 0"
+            [class.total-row]="row.isSummary">
+            <ng-container *ngIf="row.isSummary">
+              <ng-container *ngIf="row.summaryType">
+                <span *ngIf="column === displayedColumns[0]" style="font-weight:bold;">
+                  {{ row.summaryType }} Total
+                </span>
+                <span
+                  *ngIf="column !== displayedColumns[0] && ((row.summaryType === 'Booked Hours' && (column.endsWith('Booked Hours') || column === 'Booked Hours Total')) || (row.summaryType === 'Revenue' && (column.endsWith('Revenue') || column === 'Revenue Total')))"
+                  style="font-weight:bold; color:#2e7d32;">
+                  {{ formatValue(row[column], 'number') }}
+                </span>
+              </ng-container>
+              <ng-container *ngIf="!row.summaryType">
+                <span *ngIf="column === displayedColumns[0]" style="font-weight:bold;">Total</span>
+                <span *ngIf="column !== displayedColumns[0]">{{ formatValue(row[column], 'number') }}</span>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="!row.isSummary">
+              {{ formatValue(row[column], 'number') }}
+            </ng-container>
           </td>
         </tr>
       </tbody>

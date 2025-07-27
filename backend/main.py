@@ -30,6 +30,8 @@ def ensure_merge_column_types(rph_df: pd.DataFrame) -> pd.DataFrame:
     rph_df = rph_df.copy()
     rph_df['contract_code'] = rph_df['contract_code'].astype(str)
     rph_df['task_code'] = rph_df['task_code'].astype(str)
+    # Ensure task_code is always 4 digits (e.g., '0101')
+    rph_df['task_code'] = rph_df['task_code'].str.zfill(4)
     return rph_df
 
 def get_quarter_label(date: pd.Timestamp) -> str:
@@ -76,10 +78,53 @@ def generate_revenue_response(df: pd.DataFrame) -> dict:
         # print(f"generate_revenue_response - DataFrame shape: {df.shape}")
         # print(f"generate_revenue_response - Sample data: {df.head(2).to_dict('records')}")
         
-        task_revenue = df.groupby(["Contract Number", "Project Description", "Task Number", "Task Name"])[["Revenue", "Booked Hours"]].sum().reset_index()
-        contract_revenue = df.groupby("Contract Number")["Revenue"].sum().reset_index()
-        month_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Month")
-        quarter_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Quarter")
+        task_revenue = df.groupby(["Contract Number", "Project Description", "Task Number", "Task Name"])[["Booked Hours", "Revenue"]].sum().reset_index()
+        contract_revenue = df.groupby(["Contract Number"]).agg({
+            "Booked Hours": "sum",
+            "Revenue": "sum"
+        }).reset_index()
+        # Add month and quarter columns
+        df["Month"] = df["Time Booking Date"].dt.strftime("%b-%Y")
+        df["Quarter"] = df["Time Booking Date"].dt.to_period("Q").astype(str)
+        # Pivot for Revenue
+        month_revenue_rev = pivot_by_period(df.copy(), "Time Booking Date", "Month")
+        quarter_revenue_rev = pivot_by_period(df.copy(), "Time Booking Date", "Quarter")
+        # Pivot for Booked Hours
+        def pivot_hours(df, date_col, label_col):
+            df[label_col] = df[date_col].apply(label_col_map[label_col])
+            pivot = df.pivot_table(
+                index=["Contract Number"],
+                columns=label_col,
+                values="Booked Hours",
+                aggfunc="sum",
+                fill_value=0
+            ).reset_index()
+            fixed = ["Contract Number"]
+            period_cols = sorted(
+                [c for c in pivot.columns if c not in fixed],
+                key=lambda c: datetime.strptime(c.split("-")[0], "%b") if label_col == "Month" else c
+            )
+            return pivot[fixed + period_cols]
+        month_revenue_hours = pivot_hours(df.copy(), "Time Booking Date", "Month")
+        quarter_revenue_hours = pivot_hours(df.copy(), "Time Booking Date", "Quarter")
+        # Merge Revenue and Booked Hours pivots
+        def reorder_period_columns(df, periods, suffix_hours, suffix_revenue):
+            cols = [c for c in df.columns if c == "Contract Number" or c == "Project Description"]
+            for p in periods:
+                cols.append(f"{p}{suffix_hours}")
+                cols.append(f"{p}{suffix_revenue}")
+            # Add any remaining columns (if any)
+            for c in df.columns:
+                if c not in cols:
+                    cols.append(c)
+            return df[cols]
+        # Get periods in correct order
+        month_periods = [c.replace(" Booked Hours","") for c in month_revenue_hours.columns if c != "Contract Number"]
+        month_revenue = month_revenue_rev.merge(month_revenue_hours, on="Contract Number", suffixes=(" Revenue", " Booked Hours"))
+        month_revenue = reorder_period_columns(month_revenue, month_periods, " Booked Hours", " Revenue")
+        quarter_periods = [c.replace(" Booked Hours","") for c in quarter_revenue_hours.columns if c != "Contract Number"]
+        quarter_revenue = quarter_revenue_rev.merge(quarter_revenue_hours, on="Contract Number", suffixes=(" Revenue", " Booked Hours"))
+        quarter_revenue = reorder_period_columns(quarter_revenue, quarter_periods, " Booked Hours", " Revenue")
 
         # Add contract_name column to pivots
         contract_names = df.groupby("Contract Number")["Project Description"].first().to_dict()
@@ -162,6 +207,8 @@ async def upload_excel(file: UploadFile = File(...)):
         with open(save_path, "wb") as f:
             f.write(content)
 
+    # Pad Task Number to 4 digits for merge
+    df["Task Number"] = df["Task Number"].astype(str).str.zfill(4)
     # Join and compute revenue
     merged = df.merge(
         rph_df,
@@ -245,6 +292,8 @@ def get_upload_report(record_id: int):
         # print(f"Sample Contract Numbers from main: {df['Contract Number'].head().tolist()}")
         # print(f"Sample contract_codes from RPH: {rph_df['contract_code'].head().tolist()}")
 
+        # Pad Task Number to 4 digits for merge
+        df["Task Number"] = df["Task Number"].astype(str).str.zfill(4)
         merged = df.merge(
             rph_df,
             how="left",
@@ -394,6 +443,8 @@ def get_latest_revenue():
         # print(f"Revenue/Latest - RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
         # print(f"Revenue/Latest - RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
 
+        # Pad Task Number to 4 digits for merge
+        df["Task Number"] = df["Task Number"].astype(str).str.zfill(4)
         merged = df.merge(
             rph_df,
             how="left",
@@ -438,6 +489,8 @@ def get_revenue_by_id(record_id: int):
         # print(f"Revenue/Record - RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
         # print(f"Revenue/Record - RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
 
+        # Pad Task Number to 4 digits for merge
+        df["Task Number"] = df["Task Number"].astype(str).str.zfill(4)
         merged = df.merge(
             rph_df,
             how="left",
