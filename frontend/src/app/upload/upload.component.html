@@ -1,33 +1,52 @@
-<mat-card class="upload-card mat-elevation-z2">
-  <mat-card-title>📤 Upload Time Booking Report</mat-card-title>
-  <mat-card-content>
-    <!-- Drop zone -->
-    <div class="upload-zone dropzone" [class.dropzone-hover]="dragOver" [class.dropzone-disabled]="uploading"
-      (drop)="!uploading && handleDrop($event)" (dragover)="!uploading && handleDragOver($event)"
-      (dragleave)="!uploading && handleDragLeave($event)">
-      <ng-container *ngIf="!uploading; else uploadingSpinner">
-        <p>Drag & drop your .xls file here, or click to select</p>
-        <input type="file" accept=".xls, .xlsx" (change)="onFileChange($event)" />
-      </ng-container>
-      <ng-template #uploadingSpinner>
-        <mat-progress-spinner diameter="40" mode="indeterminate" color="accent"></mat-progress-spinner>
-        <p>Uploading…</p>
-      </ng-template>
-    </div>
-
-    <mat-progress-bar *ngIf="uploading" mode="determinate" [value]="uploadProgress" color="primary"></mat-progress-bar>
-
-    <button mat-raised-button color="primary" (click)="upload()" [disabled]="!file">
+<div class="upload-container">
+  <mat-card class="upload-card">
+    <mat-card-title>
       <mat-icon>cloud_upload</mat-icon>
-      Upload & Generate
-    </button>
-  </mat-card-content>
-</mat-card>
-
-<div *ngIf="latestUpload" class="upload-info">
-  <mat-icon>description</mat-icon>
-  <strong>{{ latestUpload.file_name }}</strong>
-  <span>Uploaded on: {{ latestUpload.uploaded_at | date : "medium" }}</span>
+      Upload Time Booking Report
+    </mat-card-title>
+    
+    <div class="upload-content">
+      <div class="upload-left">
+        <div class="dropzone" 
+             (dragover)="onDragOver($event)" 
+             (dragleave)="onDragLeave($event)" 
+             (drop)="onDrop($event)"
+             [class.dropzone-hover]="isDragOver"
+             (click)="fileInput.click()">
+          <div class="dropzone-content">
+            <mat-icon>cloud_upload</mat-icon>
+            <div class="dropzone-text">Drag & drop your .xls file here</div>
+            <div class="dropzone-subtext">or click to browse files</div>
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".xls,.xlsx" style="display: none;">
+          </div>
+        </div>
+        
+        <div class="uploading-content" *ngIf="uploading">
+          <mat-spinner diameter="30"></mat-spinner>
+          <div class="uploading-text">Uploading...</div>
+        </div>
+        
+        <button mat-raised-button 
+                color="primary" 
+                class="upload-btn"
+                (click)="uploadFile()" 
+                [disabled]="!selectedFile || uploading">
+          <mat-icon>cloud_upload</mat-icon>
+          Upload & Generate
+        </button>
+      </div>
+      
+      <div class="upload-right">
+        <div class="upload-info" *ngIf="uploadedFile">
+          <mat-icon>description</mat-icon>
+          <div class="file-info">
+            <div class="file-name">{{ uploadedFile.name }}</div>
+            <div class="file-date">Uploaded on: {{ uploadedFile.uploadDate | date:'MMM dd, yyyy, h:mm:ss a' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
 </div>
 
 <app-reports *ngIf="reports" [data]="reports"></app-reports>

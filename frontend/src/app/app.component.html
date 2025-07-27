@@ -27,6 +27,11 @@
         <mat-icon>bar_chart</mat-icon>
         <span>Revenue Report</span>
       </a>
+
+      <a mat-list-item routerLink="/project-dashboard" routerLinkActive="active-link">
+        <mat-icon>dashboard</mat-icon>
+        <span>Project Dashboard</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 
@@ -35,7 +40,7 @@
       <button mat-icon-button (click)="toggleSidenav()">
         <mat-icon>menu</mat-icon>
       </button>
-      Time Booking Dashboard
+      <span class="dashboard-title">Time Booking Dashboard</span>
     </mat-toolbar>
     <div class="content">
       <router-outlet></router-outlet>

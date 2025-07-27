@@ -1,12 +1,372 @@
 .revenue-panel {
   margin: 2rem auto;
-  max-width: 1200px;
-  padding: 1rem;
+  max-width: 1400px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
 
   mat-card-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 700;
     color: #fd5108;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+// Modern tab styling for revenue report
+.revenue-tabs {
+  margin: 2rem 0;
+  
+  ::ng-deep .mat-tab-group {
+    .mat-tab-header {
+      border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .mat-tab-label {
+      color: #6b7280;
+      font-weight: 500;
+      padding: 1rem 1.5rem;
+      text-transform: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      border-radius: 12px 12px 0 0;
+      margin-right: 0.5rem;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #fd5108 0%, #fe7c39 100%);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+      }
+      
+      &:hover {
+        color: #fd5108;
+        background: rgba(253, 81, 8, 0.05);
+        
+        &::before {
+          width: 60%;
+        }
+      }
+      
+      mat-icon {
+        margin-right: 8px;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+    }
+
+    .mat-tab-label-active {
+      color: #fd5108;
+      background: rgba(253, 81, 8, 0.1);
+      font-weight: 600;
+      
+      &::before {
+        width: 100%;
+      }
+      
+      mat-icon {
+        color: #fd5108;
+      }
+    }
+  }
+}
+
+// Modern controls section
+.controls-section {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(253, 81, 8, 0.05) 0%, rgba(253, 81, 8, 0.02) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(253, 81, 8, 0.1);
+  
+  .search-field {
+    flex: 1;
+    min-width: 250px;
+    
+    ::ng-deep .mat-mdc-form-field {
+      width: 100%;
+      
+      .mat-mdc-form-field-flex {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        
+        &:hover {
+          border-color: #fd5108;
+          box-shadow: 0 2px 8px rgba(253, 81, 8, 0.1);
+        }
+        
+        &:focus-within {
+          border-color: #fd5108;
+          box-shadow: 0 4px 12px rgba(253, 81, 8, 0.15);
+        }
+      }
+    }
+  }
+  
+  .filter-field {
+    min-width: 180px;
+    
+    ::ng-deep .mat-mdc-form-field {
+      .mat-mdc-form-field-flex {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        
+        &:hover {
+          border-color: #fd5108;
+          box-shadow: 0 2px 8px rgba(253, 81, 8, 0.1);
+        }
+      }
+    }
+  }
+  
+  .download-btn {
+    margin-left: auto;
+    
+    button {
+      background: linear-gradient(135deg, #fd5108 0%, #fe7c39 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(253, 81, 8, 0.3);
+      }
+      
+      mat-icon {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+// Modern revenue table
+.revenue-table {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 1.5rem;
+  
+  .table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #fd5108 0%, #fe7c39 100%);
+      border-radius: 4px;
+    }
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    
+    th {
+      background: linear-gradient(135deg, #fd5108 0%, #fe7c39 100%);
+      color: white;
+      font-weight: 600;
+      padding: 1rem;
+      text-align: left;
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      
+      &:first-child {
+        border-top-left-radius: 16px;
+      }
+      
+      &:last-child {
+        border-top-right-radius: 16px;
+      }
+    }
+    
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 14px;
+      transition: all 0.2s ease;
+      
+      &:first-child {
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+      
+      &.highlight {
+        background: rgba(253, 81, 8, 0.1);
+        font-weight: 600;
+        color: #fd5108;
+      }
+      
+      &.total-row {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+        font-weight: 700;
+        color: #16a34a;
+        border-top: 2px solid rgba(34, 197, 94, 0.2);
+      }
+    }
+    
+    tr {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(253, 81, 8, 0.05);
+        transform: scale(1.01);
+      }
+      
+      &:last-child td {
+        border-bottom: none;
+      }
+      
+      &.summary-row {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+        font-weight: 700;
+        
+        td {
+          color: #16a34a;
+          border-top: 2px solid rgba(34, 197, 94, 0.2);
+        }
+      }
+    }
+  }
+}
+
+// Modern summary cards
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+  
+  .summary-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+      
+      mat-icon {
+        color: #fd5108;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+      
+      .card-title {
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+      }
+    }
+    
+    .card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .revenue-panel {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .controls-section {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .download-btn {
+      margin-left: 0;
+      margin-top: 1rem;
+      
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .revenue-table {
+    overflow-x: auto;
+    
+    table {
+      min-width: 800px;
+    }
   }
 }

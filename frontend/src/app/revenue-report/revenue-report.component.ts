@@ -27,6 +27,12 @@ export class RevenueReportComponent implements OnInit {
   error = false;
   data: any = null;
 
+  // Data for modern template
+  taskWiseData: any = null;
+  contractWiseData: any = null;
+  monthWiseData: any = null;
+  quarterlyData: any = null;
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
@@ -34,6 +40,14 @@ export class RevenueReportComponent implements OnInit {
       next: (res) => {
         this.data = res;
         this.loading = false;
+        
+        // Set data for modern template
+        if (res) {
+          this.taskWiseData = res.taskWiseRevenue || { columns: [], data: [] };
+          this.contractWiseData = res.contractWiseRevenue || { columns: [], data: [] };
+          this.monthWiseData = res.monthlyRevenue || { columns: [], data: [] };
+          this.quarterlyData = res.quarterlyRevenue || { columns: [], data: [] };
+        }
       },
       error: () => {
         this.error = true;

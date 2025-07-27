@@ -24,6 +24,13 @@ app.add_middleware(
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+def ensure_merge_column_types(rph_df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure merge columns are strings for consistent merging"""
+    rph_df = rph_df.copy()
+    rph_df['contract_code'] = rph_df['contract_code'].astype(str)
+    rph_df['task_code'] = rph_df['task_code'].astype(str)
+    return rph_df
+
 def get_quarter_label(date: pd.Timestamp) -> str:
     month = date.month
     year = date.year
@@ -63,41 +70,49 @@ def pivot_by_period(df: pd.DataFrame, date_col: str, label_col: str) -> pd.DataF
 
 
 def generate_revenue_response(df: pd.DataFrame) -> dict:
-    task_revenue = df.groupby(["Contract Number", "Project Description", "Task Number", "Task Name"])[["Revenue", "Booked Hours"]].sum().reset_index()
-    contract_revenue = df.groupby("Contract Number")["Revenue"].sum().reset_index()
-    month_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Month")
-    quarter_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Quarter")
+    try:
+        # print(f"generate_revenue_response - DataFrame columns: {list(df.columns)}")
+        # print(f"generate_revenue_response - DataFrame shape: {df.shape}")
+        # print(f"generate_revenue_response - Sample data: {df.head(2).to_dict('records')}")
+        
+        task_revenue = df.groupby(["Contract Number", "Project Description", "Task Number", "Task Name"])[["Revenue", "Booked Hours"]].sum().reset_index()
+        contract_revenue = df.groupby("Contract Number")["Revenue"].sum().reset_index()
+        month_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Month")
+        quarter_revenue = pivot_by_period(df.copy(), "Time Booking Date", "Quarter")
 
-    # Add contract_name column to pivots
-    contract_names = df.groupby("Contract Number")["Project Description"].first().to_dict()
+        # Add contract_name column to pivots
+        contract_names = df.groupby("Contract Number")["Project Description"].first().to_dict()
 
-    contract_revenue["Project Description"] = contract_revenue["Contract Number"].map(contract_names)
-    month_revenue["Project Description"] = month_revenue["Contract Number"].map(contract_names)
-    quarter_revenue["Project Description"] = quarter_revenue["Contract Number"].map(contract_names)
+        contract_revenue["Project Description"] = contract_revenue["Contract Number"].map(contract_names)
+        month_revenue["Project Description"] = month_revenue["Contract Number"].map(contract_names)
+        quarter_revenue["Project Description"] = quarter_revenue["Contract Number"].map(contract_names)
 
-    # Reorder so that contract_name comes right after contract code
-    def reorder(df):
-        cols = list(df.columns)
-        if "Project Description" in cols and "Contract Number" in cols:
-            cols.insert(cols.index("Contract Number") + 1, cols.pop(cols.index("Project Description")))
-        return df[cols]
+        # Reorder so that contract_name comes right after contract code
+        def reorder(df):
+            cols = list(df.columns)
+            if "Project Description" in cols and "Contract Number" in cols:
+                cols.insert(cols.index("Contract Number") + 1, cols.pop(cols.index("Project Description")))
+            return df[cols]
 
-    contract_revenue = reorder(contract_revenue)
-    month_revenue = reorder(month_revenue)
-    quarter_revenue = reorder(quarter_revenue)
+        contract_revenue = reorder(contract_revenue)
+        month_revenue = reorder(month_revenue)
+        quarter_revenue = reorder(quarter_revenue)
 
-    def to_report(d: pd.DataFrame):
+        def to_report(d: pd.DataFrame):
+            return {
+                "columns": list(d.columns),
+                "data": d.to_dict(orient="records")
+            }
+
         return {
-            "columns": list(d.columns),
-            "data": d.to_dict(orient="records")
+            "taskWiseRevenue": to_report(task_revenue),
+            "contractWiseRevenue": to_report(contract_revenue),
+            "monthlyRevenue": to_report(month_revenue),
+            "quarterlyRevenue": to_report(quarter_revenue)
         }
-
-    return {
-        "taskWiseRevenue": to_report(task_revenue),
-        "contractWiseRevenue": to_report(contract_revenue),
-        "monthlyRevenue": to_report(month_revenue),
-        "quarterlyRevenue": to_report(quarter_revenue)
-    }
+    except Exception as e:
+        print(f"Error in generate_revenue_response: {str(e)}")
+        raise
 
 
 
@@ -125,6 +140,13 @@ async def upload_excel(file: UploadFile = File(...)):
             "task_code": r.task_code,
             "rph": r.rph
         } for r in rph_rows])
+        rph_df = ensure_merge_column_types(rph_df)
+
+        # Debug merge column data types for upload endpoint
+        # print(f"Upload - Main DataFrame Contract Number type: {df['Contract Number'].dtype}")
+        # print(f"Upload - Main DataFrame Task Number type: {df['Task Number'].dtype}")
+        # print(f"Upload - RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
+        # print(f"Upload - RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
 
         record = UploadHistory(
             file_name=file.filename,
@@ -212,6 +234,15 @@ def get_upload_report(record_id: int):
                 "task_code": r.task_code,
                 "rph": r.rph
             } for r in rph_rows])
+            rph_df = ensure_merge_column_types(rph_df)
+
+        # Debug merge column data types
+        # print(f"Main DataFrame Contract Number type: {df['Contract Number'].dtype}")
+        # print(f"Main DataFrame Task Number type: {df['Task Number'].dtype}")
+        # print(f"RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
+        # print(f"RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
+        # print(f"Sample Contract Numbers from main: {df['Contract Number'].head().tolist()}")
+        # print(f"Sample contract_codes from RPH: {rph_df['contract_code'].head().tolist()}")
 
         merged = df.merge(
             rph_df,
@@ -219,7 +250,12 @@ def get_upload_report(record_id: int):
             left_on=["Contract Number", "Task Number"],
             right_on=["contract_code", "task_code"]
         )
+        # print(f"Merge completed. Merged DataFrame shape: {merged.shape}")
+        # print(f"Merged DataFrame columns: {list(merged.columns)}")
+        # print(f"Sample merged data: {merged.head(2).to_dict('records')}")
+        
         merged["Revenue"] = merged["Booked Hours"] * merged["rph"]
+        # print(f"Revenue calculation completed. Sample Revenue values: {merged['Revenue'].head().tolist()}")
 
         def to_report(d: pd.DataFrame):
             return {
@@ -349,6 +385,13 @@ def get_latest_revenue():
                 "task_code": r.task_code,
                 "rph": r.rph
             } for r in rph_rows])
+            rph_df = ensure_merge_column_types(rph_df)
+
+        # Debug merge column data types for revenue/latest
+        # print(f"Revenue/Latest - Main DataFrame Contract Number type: {df['Contract Number'].dtype}")
+        # print(f"Revenue/Latest - Main DataFrame Task Number type: {df['Task Number'].dtype}")
+        # print(f"Revenue/Latest - RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
+        # print(f"Revenue/Latest - RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
 
         merged = df.merge(
             rph_df,
@@ -386,6 +429,13 @@ def get_revenue_by_id(record_id: int):
                 "task_code": r.task_code,
                 "rph": r.rph
             } for r in rph_rows])
+            rph_df = ensure_merge_column_types(rph_df)
+
+        # Debug merge column data types for revenue/{record_id}
+        # print(f"Revenue/Record - Main DataFrame Contract Number type: {df['Contract Number'].dtype}")
+        # print(f"Revenue/Record - Main DataFrame Task Number type: {df['Task Number'].dtype}")
+        # print(f"Revenue/Record - RPH DataFrame contract_code type: {rph_df['contract_code'].dtype}")
+        # print(f"Revenue/Record - RPH DataFrame task_code type: {rph_df['task_code'].dtype}")
 
         merged = df.merge(
             rph_df,

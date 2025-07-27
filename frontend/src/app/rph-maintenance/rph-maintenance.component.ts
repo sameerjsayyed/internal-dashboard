@@ -14,6 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -30,6 +32,8 @@ import * as XLSX from 'xlsx';
     MatInputModule,
     MatTableModule,
     MatSnackBarModule,
+    MatFormFieldModule,
+    MatTooltipModule,
   ],
 })
 export class RphMaintenanceComponent implements OnInit {

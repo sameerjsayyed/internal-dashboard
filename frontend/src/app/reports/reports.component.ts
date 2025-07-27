@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ReportTableComponent } from './report-table/report-table.component';
 import { MatCardModule } from '@angular/material/card';
@@ -19,8 +19,22 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule,
   ],
 })
-export class ReportsComponent {
+export class ReportsComponent implements OnInit {
   @Input() data: any;
+
+  // Data for modern template
+  taskWiseData: any = null;
+  resourceWiseData: any = null;
+  consolidatedData: any = null;
+
+  ngOnInit() {
+    if (this.data) {
+      // Handle the ReportData structure from API
+      this.taskWiseData = this.data.taskWise || { columns: [], data: [] };
+      this.resourceWiseData = this.data.resourceWise || { columns: [], data: [] };
+      this.consolidatedData = this.data.consolidated || { columns: [], data: [] };
+    }
+  }
 
   downloadExcel(label: string, columns: string[], rows: any[]) {
     const worksheet = XLSX.utils.json_to_sheet(rows, { header: columns });

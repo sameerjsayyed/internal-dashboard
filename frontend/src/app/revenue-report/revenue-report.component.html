@@ -1,39 +1,23 @@
-<mat-card class="revenue-panel mat-elevation-z2">
-    <mat-card-title>💰 Revenue Report</mat-card-title>
+<div class="revenue-panel">
+  <mat-card-title>
+    <mat-icon>attach_money</mat-icon>
+    Revenue Report
+  </mat-card-title>
 
-    <div *ngIf="loading">
-        <p>Loading revenue data…</p>
-    </div>
-
-    <div *ngIf="error">
-        <p style="color: red">Failed to load revenue data.</p>
-    </div>
-
-    <div *ngIf="!loading && data">
-        <mat-tab-group mat-stretch-tabs>
-            <mat-tab label="📊 Task Wise">
-                <app-report-table [columns]="data.taskWiseRevenue.columns" [rows]="data.taskWiseRevenue.data"
-                    [title]="'TaskWiseRevenue'">
-                </app-report-table>
-            </mat-tab>
-
-            <mat-tab label="📦 Contract Wise">
-                <app-report-table [columns]="data.contractWiseRevenue.columns" [rows]="data.contractWiseRevenue.data"
-                    [title]="'ContractWiseRevenue'">
-                </app-report-table>
-            </mat-tab>
-
-            <mat-tab label="📅 Month Wise">
-                <app-report-table [columns]="data.monthlyRevenue.columns" [rows]="data.monthlyRevenue.data"
-                    [title]="'MonthlyRevenue'">
-                </app-report-table>
-            </mat-tab>
-
-            <mat-tab label="🗓️ Quarterly">
-                <app-report-table [columns]="data.quarterlyRevenue.columns" [rows]="data.quarterlyRevenue.data"
-                    [title]="'QuarterlyRevenue'">
-                </app-report-table>
-            </mat-tab>
-        </mat-tab-group>
-    </div>
-</mat-card>
+  <div class="revenue-tabs">
+    <mat-tab-group>
+      <mat-tab label="Task Wise">
+        <app-report-table [data]="taskWiseData"></app-report-table>
+      </mat-tab>
+      <mat-tab label="Contract Wise">
+        <app-report-table [data]="contractWiseData"></app-report-table>
+      </mat-tab>
+      <mat-tab label="Month Wise">
+        <app-report-table [data]="monthWiseData"></app-report-table>
+      </mat-tab>
+      <mat-tab label="Quarterly">
+        <app-report-table [data]="quarterlyData"></app-report-table>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

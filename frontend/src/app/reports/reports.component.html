@@ -1,18 +1,15 @@
-<mat-card class="report-panel mat-elevation-z2">
-  <mat-tab-group class="modern-tabs" mat-stretch-tabs>
-    <mat-tab label="📊 Task Wise">
-      <app-report-table [columns]="data.taskWise.columns" [rows]="data.taskWise.data" [title]="'TaskWise'">
-      </app-report-table>
-    </mat-tab>
-
-    <mat-tab label="👥 Resource Wise">
-      <app-report-table [columns]="data.resourceWise.columns" [rows]="data.resourceWise.data" [title]="'ResourceWise'">
-      </app-report-table>
-    </mat-tab>
-
-    <mat-tab label="📋 Consolidated">
-      <app-report-table [title]="'Consolidated'" [columns]="data.consolidated.columns" [rows]="data.consolidated.data">
-      </app-report-table>
-    </mat-tab>
-  </mat-tab-group>
-</mat-card>
+<div class="report-tabs">
+  <div class="tabs-container">
+    <mat-tab-group>
+      <mat-tab label="Task Wise">
+        <app-report-table [data]="taskWiseData"></app-report-table>
+      </mat-tab>
+      <mat-tab label="Resource Wise">
+        <app-report-table [data]="resourceWiseData"></app-report-table>
+      </mat-tab>
+      <mat-tab label="Consolidated">
+        <app-report-table [data]="consolidatedData"></app-report-table>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

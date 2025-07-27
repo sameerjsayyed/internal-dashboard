@@ -1,43 +1,58 @@
 .rph-panel {
   margin: 2rem auto;
-  padding: 1.5rem;
-  max-width: 1200px;
+  padding: 2rem;
+  max-width: 1400px;
   background: #fff;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
 
   mat-card-title {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
     color: #fd5108;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 }
 
 .header-actions {
   display: flex;
   justify-content: flex-start;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 
   button {
     color: #fd5108;
     font-weight: 500;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #fff3e6;
+      transform: translateY(-1px);
+    }
   }
 }
 
 .dropzone {
-  border: 2px dashed #ccc;
-  padding: 1rem;
-  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+  padding: 2rem;
+  border-radius: 12px;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 14px;
   cursor: pointer;
   color: #666;
+  background: #fafafa;
+  transition: all 0.3s ease;
 
   &.hovered {
     background: #fff8f2;
     border-color: #fd5108;
+    transform: scale(1.02);
   }
 
   .browse {
@@ -45,6 +60,11 @@
     text-decoration: underline;
     cursor: pointer;
     font-weight: 500;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: #e04500;
+    }
   }
 }
 
@@ -52,55 +72,231 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
+  
+  button {
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(253, 81, 8, 0.2);
+    }
+  }
 }
 
 .footer-add-row {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   text-align: left;
+  
+  button {
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(253, 81, 8, 0.3);
+    }
+  }
+}
+
+.table-container {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  margin: 1rem 0;
 }
 
 table.modern-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 
   th {
-    background: #fff3e6;
+    background: linear-gradient(135deg, #fff3e6 0%, #ffe8cc 100%);
     color: #3e3e00;
-    font-weight: bold;
+    font-weight: 600;
     text-align: left;
-    padding: 8px;
+    padding: 16px 20px;
+    border-bottom: 2px solid #fd5108;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      
+      mat-icon {
+        color: #fd5108;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+      
+      span {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 12px;
+      }
+    }
   }
 
   td {
     background: #ffffff;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-
-    input {
-      width: 100%;
-      background: #fff;
-      border-radius: 4px;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s ease;
+    
+    .cell-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      
+      .compact-field {
+        flex: 1;
+        
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+        
+        ::ng-deep .mat-mdc-text-field-wrapper {
+          background: #fafafa;
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            border-color: #fd5108;
+            background: #fff;
+          }
+          
+          &.mat-focused {
+            border-color: #fd5108;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(253, 81, 8, 0.1);
+          }
+        }
+        
+        ::ng-deep .mat-mdc-form-field-infix {
+          padding: 8px 0;
+          min-height: auto;
+        }
+        
+        ::ng-deep .mat-mdc-input-element {
+          font-size: 14px;
+          color: #333;
+        }
+      }
+      
+      .edited-icon {
+        color: #fd5108;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        animation: pulse 2s infinite;
+      }
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      
+      button {
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+      }
     }
   }
 
-  tr.highlighted td {
-    background: #fffbe6 !important;
-    border-left: 4px solid #fd5108;
-    transition: background 0.3s ease;
-  }
-
-  tr:hover td {
-    background: #fef4eb;
+  tr {
+    transition: all 0.2s ease;
+    
+    &:hover td {
+      background: #fef4eb;
+      transform: scale(1.01);
+    }
+    
+    &.highlighted td {
+      background: linear-gradient(135deg, #fff8f2 0%, #fff3e6 100%) !important;
+      border-left: 4px solid #fd5108;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #fd5108 0%, #ff6b35 100%);
+        border-radius: 0 2px 2px 0;
+      }
+    }
+    
+    &.modified {
+      animation: highlightRow 0.6s ease-in-out;
+    }
   }
 }
 
-.edited-icon {
-  font-size: 16px;
-  color: #fd5108;
-  margin-left: 6px;
-  vertical-align: middle;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes highlightRow {
+  0% {
+    background: #fff3e6;
+    transform: scale(1.02);
+  }
+  100% {
+    background: #fff8f2;
+    transform: scale(1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .rph-panel {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    
+    table {
+      min-width: 600px;
+    }
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+    
+    button {
+      width: 100%;
+    }
+  }
 }

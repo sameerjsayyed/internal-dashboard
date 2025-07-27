@@ -1,0 +1,135 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Project Dashboard</h1>
+    <p>Overview of project metrics and performance</p>
+  </div>
+
+  <div class="dashboard-content">
+    <mat-grid-list cols="3" rowHeight="200px" gutterSize="16px">
+      <!-- Project Overview Card -->
+      <mat-grid-tile>
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>dashboard</mat-icon>
+              Project Overview
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric">
+              <span class="metric-value">12</span>
+              <span class="metric-label">Active Projects</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">85%</span>
+              <span class="metric-label">Completion Rate</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Time Tracking Card -->
+      <mat-grid-tile>
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>schedule</mat-icon>
+              Time Tracking
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric">
+              <span class="metric-value">156</span>
+              <span class="metric-label">Hours This Week</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">8.5</span>
+              <span class="metric-label">Avg Hours/Day</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Revenue Card -->
+      <mat-grid-tile>
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>attach_money</mat-icon>
+              Revenue
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metric">
+              <span class="metric-value">$12,450</span>
+              <span class="metric-label">This Month</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">+15%</span>
+              <span class="metric-label">vs Last Month</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Recent Activity Card -->
+      <mat-grid-tile colspan="2">
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>timeline</mat-icon>
+              Recent Activity
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="activity-list">
+              <div class="activity-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>Project Alpha milestone completed</span>
+                <span class="activity-time">2 hours ago</span>
+              </div>
+              <div class="activity-item">
+                <mat-icon>schedule</mat-icon>
+                <span>Time entry logged for Project Beta</span>
+                <span class="activity-time">4 hours ago</span>
+              </div>
+              <div class="activity-item">
+                <mat-icon>assignment</mat-icon>
+                <span>New task assigned to Project Gamma</span>
+                <span class="activity-time">1 day ago</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Quick Actions Card -->
+      <mat-grid-tile>
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>flash_on</mat-icon>
+              Quick Actions
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="action-buttons">
+              <button mat-raised-button color="primary">
+                <mat-icon>add</mat-icon>
+                New Project
+              </button>
+              <button mat-raised-button color="accent">
+                <mat-icon>schedule</mat-icon>
+                Log Time
+              </button>
+              <button mat-raised-button>
+                <mat-icon>assessment</mat-icon>
+                Generate Report
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </div>
+</div>

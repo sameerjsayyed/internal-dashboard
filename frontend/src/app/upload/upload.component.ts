@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpEventType } from '@angular/common/http';
-import { ApiService, UploadHistory, ReportData } from '../services/api.service';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReportsComponent } from '../reports/reports.component';
 
 @Component({
@@ -14,117 +13,131 @@ import { ReportsComponent } from '../reports/reports.component';
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
   imports: [
-    ReportsComponent,
     CommonModule,
-    MatCardModule,
-    DragDropModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
     MatIconModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    DatePipe,
+    ReportsComponent
   ],
+  standalone: true
 })
 export class UploadComponent implements OnInit {
-  file!: File;
-  reports: ReportData | null = null;
-  latestUpload: UploadHistory | null = null;
-
-  dragOver = false;
+  selectedFile: File | null = null;
   uploading = false;
-  uploadProgress = 0;
+  isDragOver = false;
+  uploadedFile: any = null;
+  reports: any = null;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-    this.fetchLatestUpload();
+    // Load last uploaded file info
+    this.loadLastUploadedFile();
+    // Load reports data
+    this.loadReports();
   }
 
-  fetchLatestUpload() {
-    this.apiService.getLatestUpload().subscribe({
-      next: (upload) => {
-        if (!upload) {
-          console.warn('No uploads found.');
-          return;
-        }
-        this.latestUpload = upload;
-        this.loadReportData(upload.id);
-      },
-      error: () => {
-        console.warn('No recent upload found.');
-      },
-    });
-  }
-
-  loadReportData(id: number) {
-    this.apiService.getUploadById(id).subscribe({
-      next: (data) => {
-        this.reports = data;
-      },
-      error: () => {
-        alert('Failed to load report for latest upload.');
-      },
-    });
-  }
-
-  onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this.file = input.files[0];
-    }
-  }
-
-  handleDragOver(event: DragEvent): void {
+  onDragOver(event: DragEvent): void {
     event.preventDefault();
-    this.dragOver = true;
+    event.stopPropagation();
+    this.isDragOver = true;
   }
 
-  handleDragLeave(event: DragEvent): void {
+  onDragLeave(event: DragEvent): void {
     event.preventDefault();
-    this.dragOver = false;
+    event.stopPropagation();
+    this.isDragOver = false;
   }
 
-  handleDrop(event: DragEvent): void {
+  onDrop(event: DragEvent): void {
     event.preventDefault();
-    this.dragOver = false;
+    event.stopPropagation();
+    this.isDragOver = false;
+    
     const files = event.dataTransfer?.files;
-    if (files?.length) {
-      const droppedFile = files[0];
-      if (
-        !droppedFile.name.endsWith('.xls') &&
-        !droppedFile.name.endsWith('.xlsx')
-      ) {
-        alert('Only .xls or .xlsx files are allowed.');
-        return;
-      }
-      this.file = droppedFile;
-      this.upload();
+    if (files && files.length > 0) {
+      this.selectedFile = files[0];
     }
   }
 
-  upload(): void {
-    if (!this.file) return;
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
 
-    const formData = new FormData();
-    formData.append('file', this.file);
+  uploadFile(): void {
+    if (!this.selectedFile) {
+      this.snackBar.open('Please select a file first', 'Close', { duration: 3000 });
+      return;
+    }
 
     this.uploading = true;
-    this.uploadProgress = 0;
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
 
-    this.apiService.uploadFile(formData).subscribe({
-      next: (event) => {
-        if (event.type === HttpEventType.UploadProgress && event.total) {
-          this.uploadProgress = Math.round(100 * (event.loaded / event.total));
-        }
-        if (event.type === HttpEventType.Response) {
-          this.reports = event.body as ReportData;
-          this.uploading = false;
-          this.uploadProgress = 100;
-          this.fetchLatestUpload(); // refresh latest metadata
-        }
-      },
-      error: (err) => {
-        alert(err?.error?.detail || 'Upload failed');
+    this.http.post('http://localhost:8000/upload', formData).subscribe({
+      next: (response: any) => {
         this.uploading = false;
+        this.uploadedFile = {
+          name: this.selectedFile?.name,
+          uploadDate: new Date()
+        };
+        this.snackBar.open('File uploaded successfully!', 'Close', { duration: 3000 });
+        this.selectedFile = null;
+        // Set reports data from upload response
+        this.reports = response;
       },
+      error: (error) => {
+        this.uploading = false;
+        this.snackBar.open('Upload failed. Please try again.', 'Close', { duration: 3000 });
+        console.error('Upload error:', error);
+      }
+    });
+  }
+
+  private loadLastUploadedFile(): void {
+    // Load last uploaded file info from API
+    this.http.get('http://localhost:8000/history/latest').subscribe({
+      next: (response: any) => {
+        if (response && response.file_name) {
+          this.uploadedFile = {
+            name: response.file_name,
+            uploadDate: new Date(response.uploaded_at)
+          };
+        }
+      },
+      error: (error) => {
+        console.error('Error loading last uploaded file:', error);
+      }
+    });
+  }
+
+  private loadReports(): void {
+    // Load reports data from latest upload
+    this.http.get('http://localhost:8000/history/latest').subscribe({
+      next: (response: any) => {
+        if (response && response.id) {
+          // Get the report data for the latest upload
+          this.http.get(`http://localhost:8000/history/${response.id}`).subscribe({
+            next: (reportData: any) => {
+              this.reports = reportData;
+            },
+            error: (error) => {
+              console.error('Error loading report data:', error);
+            }
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading latest upload:', error);
+      }
     });
   }
 }
