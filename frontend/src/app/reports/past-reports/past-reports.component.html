@@ -21,19 +21,40 @@
             </button>
           </div>
 
-          <table mat-table [dataSource]="filteredDataSource" class="mat-elevation-z1">
+                    <table mat-table [dataSource]="filteredDataSource" class="mat-elevation-z1">
             <ng-container matColumnDef="file_name">
-              <th mat-header-cell *matHeaderCellDef>File Name</th>
+              <th mat-header-cell *matHeaderCellDef (click)="sortTableColumn('file_name')" class="sortable">
+                <div class="header-content">
+                  <span class="header-text">File Name</span>
+                  <mat-icon class="sort-icon" [class.sorted]="currentSortColumn === 'file_name'">
+                    {{ getSortIcon('file_name') }}
+                  </mat-icon>
+                </div>
+              </th>
               <td mat-cell *matCellDef="let row">{{ row.file_name }}</td>
             </ng-container>
 
             <ng-container matColumnDef="file_size_kb">
-              <th mat-header-cell *matHeaderCellDef>Size</th>
+              <th mat-header-cell *matHeaderCellDef (click)="sortTableColumn('file_size_kb')" class="sortable">
+                <div class="header-content">
+                  <span class="header-text">Size</span>
+                  <mat-icon class="sort-icon" [class.sorted]="currentSortColumn === 'file_size_kb'">
+                    {{ getSortIcon('file_size_kb') }}
+                  </mat-icon>
+                </div>
+              </th>
               <td mat-cell *matCellDef="let row">{{ row.file_size_kb }} KB</td>
             </ng-container>
 
             <ng-container matColumnDef="uploaded_at">
-              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <th mat-header-cell *matHeaderCellDef (click)="sortTableColumn('uploaded_at')" class="sortable">
+                <div class="header-content">
+                  <span class="header-text">Date</span>
+                  <mat-icon class="sort-icon" [class.sorted]="currentSortColumn === 'uploaded_at'">
+                    {{ getSortIcon('uploaded_at') }}
+                  </mat-icon>
+                </div>
+              </th>
               <td mat-cell *matCellDef="let row">
                 {{ row.uploaded_at | date : "MMM dd, yyyy, h:mm:ss a" }}
               </td>
@@ -42,7 +63,7 @@
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let row">
-                <button mat-icon-button color="warn" (click)="deleteOne(row.id)">
+                <button class="delete-btn" (click)="deleteOne(row.id)">
                   <mat-icon>delete</mat-icon>
                 </button>
               </td>

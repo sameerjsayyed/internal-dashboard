@@ -6,6 +6,7 @@ from sqlmodel import SQLModel, Session, create_engine, select, delete
 from models import UploadHistory
 from rph_models import RPHMaster, RPHMasterCreate
 from datetime import datetime
+import pytz
 
 from parser import parse_raw_excel, build_reports   # keep logic isolated
 
@@ -108,7 +109,7 @@ def generate_revenue_response(df: pd.DataFrame) -> dict:
             "taskWiseRevenue": to_report(task_revenue),
             "contractWiseRevenue": to_report(contract_revenue),
             "monthlyRevenue": to_report(month_revenue),
-            "quarterlyRevenue": to_report(quarter_revenue)
+            "quarterlyRevenue": to_report(quarterly_revenue)
         }
     except Exception as e:
         print(f"Error in generate_revenue_response: {str(e)}")
@@ -187,7 +188,7 @@ async def upload_excel(file: UploadFile = File(...)):
     quarterly_revenue = merged.groupby(["Contract Number", "Quarter"])["Revenue"].sum().reset_index()
 
     return {
-        "generatedAt": datetime.utcnow().isoformat() + "Z",
+        "generatedAt": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat() + "Z",
         "taskWise": df_to_dict(reports["taskWise"]),
         "resourceWise": df_to_dict(reports["resourceWise"]),
         "consolidated": df_to_dict(reports["consolidated"]),
